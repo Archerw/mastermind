@@ -24,9 +24,11 @@ public final class GameApi {
 
     public UpdateUI(int yourPlayerId, List<Map<String, Object>> playersInfo,
         Map<String, Object> state) {
+    	
       this.yourPlayerId = yourPlayerId;
       this.playersInfo = playersInfo;
       this.state = state;
+      
     }
 
     @Override
