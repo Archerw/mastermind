@@ -44,7 +44,6 @@ public class MasterMindLogicTest {
   private static final String GUESS = "GUESS";
   private static final String FEEDBACK = "FEEDBACK";
   private final String CURRENTTURN = "CurrentTurn";
-  private final String SCORE = "Score";
   
   
   private final String CODELENGTH= "CodeLength";
@@ -328,6 +327,46 @@ public class MasterMindLogicTest {
     return init;
   }
   
+  private List<Operation> getMoreGuessOperations() {
+  	List<Operation> init = ImmutableList.<Operation>builder()
+  		.add(new Set(TURN,W))
+  		.add(new Set(CURRENTMOVE,FEEDBACK))
+  		.add(new Set(CURRENTTURN,1))
+  		.add(new Set(GUESSHISTORY,ImmutableList.<String>of("1234","5678")))
+  		.build();
+    return init;
+  }
+  
+  private List<Operation> getIllegalGuessOperationsWithLongerHistory() {
+  	List<Operation> init = ImmutableList.<Operation>builder()
+  		.add(new Set(TURN,W))
+  		.add(new Set(CURRENTMOVE,FEEDBACK))
+  		.add(new Set(CURRENTTURN,1))
+  		.add(new Set(GUESSHISTORY,ImmutableList.<String>of("1234","1234","5678")))
+  		.build();
+    return init;
+  }
+  
+  private List<Operation> getIllegalGuessOperationsWithShorterHistory() {
+  	List<Operation> init = ImmutableList.<Operation>builder()
+  		.add(new Set(TURN,W))
+  		.add(new Set(CURRENTMOVE,FEEDBACK))
+  		.add(new Set(CURRENTTURN,1))
+  		.add(new Set(GUESSHISTORY,ImmutableList.<String>of("5678")))
+  		.build();
+    return init;
+  }
+  
+  private List<Operation> getIllegalGuessOperationsWithCHangedHistory() {
+  	List<Operation> init = ImmutableList.<Operation>builder()
+  		.add(new Set(TURN,W))
+  		.add(new Set(CURRENTMOVE,FEEDBACK))
+  		.add(new Set(CURRENTTURN,1))
+  		.add(new Set(GUESSHISTORY,ImmutableList.<String>of("5678","5678")))
+  		.build();
+    return init;
+  }
+  
   @Test
   public void testLegalGuess(){
   	assertMoveOk(move(bId, codedState, getGuessOperations()));
@@ -350,12 +389,23 @@ public class MasterMindLogicTest {
   	assertHacker(move(bId, codedState, getGuessOperationsWithMessageCode()));
   }
   
+  @Test
+  public void testLegalMoreGuess(){
+  	assertMoveOk(move(bId, returnedState, getMoreGuessOperations()));
+  }
+  
+  @Test
+  public void testMoreGuessWithIllegalHistory(){
+  	assertHacker(move(bId, returnedState, getIllegalGuessOperationsWithLongerHistory()));
+  	assertHacker(move(bId, returnedState, getIllegalGuessOperationsWithShorterHistory()));
+  	assertHacker(move(bId, returnedState, getIllegalGuessOperationsWithCHangedHistory()));
+  }
   
   private List<Operation> getFeedbackOperations() {
   	List<Operation> init = ImmutableList.<Operation>builder()
   		.add(new Set(TURN,B))
   		.add(new Set(CURRENTMOVE,GUESS))
-  		.add(new Set(FEEDBACKHISTORY,ImmutableList.<String>of("1234")))
+  		.add(new Set(FEEDBACKHISTORY,ImmutableList.<String>of("1b0w")))
   		.build();
     return init;
   }
@@ -364,7 +414,7 @@ public class MasterMindLogicTest {
   	List<Operation> init = ImmutableList.<Operation>builder()
   		.add(new Set(TURN,W))
   		.add(new Set(CURRENTMOVE,GUESS))
-  		.add(new Set(FEEDBACKHISTORY,ImmutableList.<String>of("1234")))
+  		.add(new Set(FEEDBACKHISTORY,ImmutableList.<String>of("1b0w")))
   		.build();
     return init;
   }
@@ -373,12 +423,12 @@ public class MasterMindLogicTest {
   	List<Operation> init = ImmutableList.<Operation>builder()
   		.add(new Set(TURN,B))
   		.add(new Set(CURRENTMOVE,FEEDBACK))
-  		.add(new Set(FEEDBACKHISTORY,ImmutableList.<String>of("1234")))
+  		.add(new Set(FEEDBACKHISTORY,ImmutableList.<String>of("1b0w")))
   		.build();
     return init;
   }
   
-  private List<Operation> getFeedbackOperationsWithMessageLength() {
+  private List<Operation> getFeedbackOperationsWithWrongMessageLength() {
   	List<Operation> init = ImmutableList.<Operation>builder()
   		.add(new Set(TURN,B))
   		.add(new Set(CURRENTMOVE,GUESS))
@@ -387,11 +437,20 @@ public class MasterMindLogicTest {
     return init;
   }
   
-  private List<Operation> getFeedbackOperationsWithMessageCode() {
+  private List<Operation> getFeedbackOperationsWithWrongMessageCode() {
   	List<Operation> init = ImmutableList.<Operation>builder()
   		.add(new Set(TURN,B))
   		.add(new Set(CURRENTMOVE,GUESS))
-  		.add(new Set(FEEDBACKHISTORY,ImmutableList.<String>of("123d")))
+  		.add(new Set(FEEDBACKHISTORY,ImmutableList.<String>of("1w3b")))
+  		.build();
+    return init;
+  }
+  
+  private List<Operation> getFeedbackOperationsWithWrongHistoryLength() {
+  	List<Operation> init = ImmutableList.<Operation>builder()
+  		.add(new Set(TURN,B))
+  		.add(new Set(CURRENTMOVE,GUESS))
+  		.add(new Set(FEEDBACKHISTORY,ImmutableList.<String>of("1b1w","1b0w")))
   		.build();
     return init;
   }
@@ -414,8 +473,9 @@ public class MasterMindLogicTest {
   
   @Test
   public void testIllegalFeedbackWithWrongMessage(){
-  	assertHacker(move(wId, guessedState, getFeedbackOperationsWithMessageLength()));
-  	assertHacker(move(wId, guessedState, getFeedbackOperationsWithMessageCode()));
+  	assertHacker(move(wId, guessedState, getFeedbackOperationsWithWrongMessageLength()));
+  	assertHacker(move(wId, guessedState, getFeedbackOperationsWithWrongMessageCode()));
+  	assertHacker(move(wId, guessedState, getFeedbackOperationsWithWrongHistoryLength()));
   }
   
   @Test
@@ -451,6 +511,101 @@ public class MasterMindLogicTest {
     		.add(new Delete(CODE))
     		.build();
     assertMoveOk(move(bId, state, operations));
+  }
+  
+  
+  private final Map<String, Object> initialSwitchedState = ImmutableMap.<String,Object>builder()
+  		.put(TURN,B)
+  		.put(CODELENGTH, CL)
+  		.put(MAXTURN,MT)
+  		.put(MAXDIGIT,MD)
+  		.put(GUESSHISTORY, ImmutableList.<String>of())
+  		.put(FEEDBACKHISTORY, ImmutableList.<String>of())
+  		.put(CURRENTGAME,2)
+  		.put(CURRENTMOVE,CODE)
+  		.put(CURRENTTURN,0)
+  		.build();
+  
+  private final Map<String, Object> codedSwitchedState = ImmutableMap.<String,Object>builder()
+  		.put(TURN,W)
+  		.put(CODELENGTH, CL)
+  		.put(MAXTURN,MT)
+  		.put(MAXDIGIT,MD)
+  		.put(GUESSHISTORY, ImmutableList.<String>of())
+  		.put(FEEDBACKHISTORY, ImmutableList.<String>of())
+  		.put(CURRENTGAME,2)
+  		.put(CURRENTMOVE,GUESS)
+  		.put(CURRENTTURN,0)
+  		.put(CODE,"1598")
+  		.build();
+  
+  private final Map<String, Object> guessedSwitchedState = ImmutableMap.<String,Object>builder()
+  		.put(TURN,B)
+  		.put(CODELENGTH, CL)
+  		.put(MAXTURN,MT)
+  		.put(MAXDIGIT,MD)
+  		.put(GUESSHISTORY, ImmutableList.<String>of("1234"))
+  		.put(FEEDBACKHISTORY, ImmutableList.<String>of())
+  		.put(CURRENTGAME,2)
+  		.put(CURRENTMOVE,FEEDBACK)
+  		.put(CURRENTTURN,1)
+  		.put(CODE,"1598")
+  		.build();
+  
+  private final Map<String, Object> returnedSwitchedState = ImmutableMap.<String,Object>builder()
+  		.put(TURN,W)
+  		.put(CODELENGTH, CL)
+  		.put(MAXTURN,MT)
+  		.put(MAXDIGIT,MD)
+  		.put(GUESSHISTORY, ImmutableList.<String>of("1234"))
+  		.put(FEEDBACKHISTORY, ImmutableList.<String>of("1b0w"))
+  		.put(CURRENTGAME,2)
+  		.put(CURRENTMOVE,GUESS)
+  		.put(CURRENTTURN,1)
+  		.put(CODE,"1598")
+  		.build();
+  
+  private List<Operation> getSwitchedCodeOperations() {
+  	List<Operation> init = ImmutableList.<Operation>builder()
+  		.add(new Set(TURN,W))
+  		.add(new Set(CURRENTMOVE,GUESS))
+  		.add(new Set(CODE,"1598"))
+  		.add(new SetVisibility(CODE,ImmutableList.of(bId)))
+  		.build();
+    return init;
+  }
+  
+  private List<Operation> getSwitchedGuessOperations() {
+  	List<Operation> init = ImmutableList.<Operation>builder()
+  		.add(new Set(TURN,B))
+  		.add(new Set(CURRENTMOVE,FEEDBACK))
+  		.add(new Set(CURRENTTURN,1))
+  		.add(new Set(GUESSHISTORY,ImmutableList.<String>of("1234")))
+  		.build();
+    return init;
+  }
+  
+  private List<Operation> getSwitchedFeedbackOperations() {
+  	List<Operation> init = ImmutableList.<Operation>builder()
+  		.add(new Set(TURN,W))
+  		.add(new Set(CURRENTMOVE,GUESS))
+  		.add(new Set(FEEDBACKHISTORY,ImmutableList.<String>of("1b0w")))
+  		.build();
+    return init;
+  }
+  
+  @Test
+  public void testSwitchedGameMoves() {
+  	assertMoveOk(move(bId, initialSwitchedState, getSwitchedCodeOperations()));
+  	assertMoveOk(move(wId, codedSwitchedState, getSwitchedGuessOperations()));
+  	assertMoveOk(move(bId, guessedSwitchedState, getSwitchedFeedbackOperations()));
+  }
+  
+  @Test
+  public void testSwitchedGameMovesWithWrongPlayer() {
+  	assertHacker(move(wId, initialSwitchedState, getSwitchedCodeOperations()));
+  	assertHacker(move(bId, codedSwitchedState, getSwitchedGuessOperations()));
+  	assertHacker(move(wId, guessedSwitchedState, getSwitchedFeedbackOperations()));
   }
   
   @Test
