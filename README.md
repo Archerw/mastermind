@@ -1,4 +1,4 @@
-Welcome to game MasterMind
+#Welcome to game MasterMind
 
 ========
 
