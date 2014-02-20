@@ -20,8 +20,5 @@ public class CodeFeedbackTest {
     assertEquals(CodeFeedback.getValidFeedback("1234", "4321"),"0b4w");
     assertEquals(CodeFeedback.getValidFeedback("1234", "2345"),"0b3w");
     assertEquals(CodeFeedback.getValidFeedback("1234", "2456"),"0b2w");
-    
-    
-  }
-
+    }
 }

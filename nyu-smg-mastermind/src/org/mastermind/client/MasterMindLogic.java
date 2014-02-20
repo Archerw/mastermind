@@ -37,7 +37,7 @@ public class MasterMindLogic {
   private final int MD = 9;
   
   /**
-   * Check if move is legal
+   * VerifyMove validation
    * If not exception thrown then the move is legal
    * @param verifyMove
    * @return
@@ -51,6 +51,11 @@ public class MasterMindLogic {
     }
   }
   
+  /**
+   * Check move if it is legal.
+   * Checking is based on condition of lastState
+   * @param verifyMove
+   */
   private void checkMoveIsLegal(VerifyMove verifyMove){
     Map<String, Object> lastState = verifyMove.getLastState();
     // We use SetTurn, so we don't need to check that the correct player did the move.
