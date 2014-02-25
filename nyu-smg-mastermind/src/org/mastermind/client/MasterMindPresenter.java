@@ -71,6 +71,14 @@ public class MasterMindPresenter {
     /**
      * UI/presenter interaction functions
      * 
+     * Presenter first send a signal to the view. The view will collect information from the user,
+     * e.g. code, guess or feedback and return to the presenter via related methods.
+     * 1) {@link #sendCodeMove} to set code 
+     * 2) {@link #sendGuessMove} to guess result
+     * 3) {@link #sendFeedbackMove} to give feedback
+     * 
+     * Since collecting and giving the code is relatively simple, it purely works in viewer's
+     * domain. 
      */
     
     /**
@@ -167,13 +175,13 @@ public class MasterMindPresenter {
         this.code = "    ";
         view.setCoderStateCode(state);
         if (isMyTurn()){
-        	currentMove = CODE;
+          currentMove = CODE;
           view.startCode(code);
         }
       } else if (VERIFY == state.get(CURRENTMOVE)){
         //Subgame end and verify is done
-      	currentMove = VERIFY;
-      	view.setCoderStateFeedback(state);
+        currentMove = VERIFY;
+        view.setCoderStateFeedback(state);
         if (isMyTurn()){
           if ((int)state.get(CURRENTGAME) == 1){
             this.sendSwitchcoderMove();
@@ -183,7 +191,7 @@ public class MasterMindPresenter {
         }
       } else {
         //TODO calculate feedback Directly
-      	currentMove = FEEDBACK;
+        currentMove = FEEDBACK;
         this.feedback = "    ";
         view.setCoderStateFeedback(state);
         if (isMyTurn()){
