@@ -26,6 +26,7 @@ public class MasterMindPresenter {
   private static final String FEEDBACK = "FEEDBACK";
   private static final String VERIFY = "VERIFY";
   private final String CURRENTTURN = "CurrentTurn";
+  private final String END = "End";
   
   
   private final String CODELENGTH= "CodeLength";
@@ -35,15 +36,15 @@ public class MasterMindPresenter {
   private final String MAXDIGIT= "MaxDigit";
   private final int MD = 9;
   
-  interface View {
+  public interface View {
     /**
      * Set the presenter. The view will call certain methods on the presenter.
      * 1) {@link #sendCodeMove} to set code 
      * 2) {@link #sendGuessMove} to guess result
      * 3) {@link #sendFeedbackMove} to give feedback
-     * @param cheatPresenter
+     * @param masterMindPresenter
      */
-    void setPresenter(MasterMindPresenter cheatPresenter);
+    void setPresenter(MasterMindPresenter masterMindPresenter);
     
     /**
      * Set default display for viewer
@@ -98,6 +99,11 @@ public class MasterMindPresenter {
      * @param feedback is initial display of guess area
      */
     void startFeedback(String feedback);
+    
+    /**
+     * Send end game info, tell the presenter if the player is the winner
+     */
+    void sendEndGameInfo(boolean isWin);
   }
   
   private final MasterMindLogic masterMindLogic = new MasterMindLogic();
@@ -158,7 +164,7 @@ public class MasterMindPresenter {
       return;
     }
     //Determine role
-    int currentGame = (int)state.get(CURRENTGAME);
+    int currentGame = (Integer)state.get(CURRENTGAME);
     if ((currentGame+yourPlayerIndex) % 2 == 0){
       this.guesserId = yourPlayerId;
       this.coderId = otherPlayerId;
@@ -183,13 +189,13 @@ public class MasterMindPresenter {
         currentMove = VERIFY;
         view.setCoderStateFeedback(state);
         if (isMyTurn()){
-          if ((int)state.get(CURRENTGAME) == 1){
+          if ((Integer)state.get(CURRENTGAME) == 1){
             this.sendSwitchcoderMove();
           } else {
             this.sendEndGameMove();
           }
         }
-      } else {
+      } else if (FEEDBACK == state.get(CURRENTMOVE)){
         //TODO calculate feedback Directly
         currentMove = FEEDBACK;
         this.feedback = "    ";
@@ -197,6 +203,12 @@ public class MasterMindPresenter {
         if (isMyTurn()){
           view.startFeedback(feedback);
         }
+      } else {
+        view.setCoderStateFeedback(state);
+        
+      }
+      if (END == state.get(CURRENTMOVE)){
+        view.sendEndGameInfo(isWin(yourPlayerId));
       }
     } else {
     //Guesser
@@ -206,8 +218,12 @@ public class MasterMindPresenter {
       if (isMyTurn()){
         view.startGuess(guess);
       }
+      if (END == state.get(CURRENTMOVE)){
+        view.sendEndGameInfo(isWin(yourPlayerId));
+      }
     }
   }
+  
 
   private boolean isMyTurn() {
     return myColor.isPresent() && myColor.get() == turnOfColor;
@@ -217,9 +233,9 @@ public class MasterMindPresenter {
    * Send a code signal to presenter. Must be called only in CODE state
    * @param code
    */
-  void sendCodeMove(String code){
+  public void sendCodeMove(String code){
     check(isMyTurn() && currentMove == CODE);
-    int maxDigit = (int)state.get(MAXDIGIT);
+    int maxDigit = (Integer)state.get(MAXDIGIT);
     check(masterMindLogic.checkValidCode(code, maxDigit));
     this.sendCodeOperation(coderId, guesserId, code);
   }
@@ -228,9 +244,9 @@ public class MasterMindPresenter {
    * Send a guess signal to presenter. Must be called only in GUESS state.
    * @param guess
    */
-  void sendGuessMove(String guess){
+  public void sendGuessMove(String guess){
     check(isMyTurn() && currentMove == GUESS);
-    int maxDigit = (int)state.get(MAXDIGIT);
+    int maxDigit = (Integer)state.get(MAXDIGIT);
     check(masterMindLogic.checkValidCode(guess, maxDigit));
     this.sendGuessOperation(coderId, guesserId, guess, state);
   }
@@ -239,10 +255,10 @@ public class MasterMindPresenter {
    * Send a feedback signal to presenter. Must be called only in FEEDBACK state
    * @param feedback
    */
-  void sendFeedbackMove(String feedback){
+  public void sendFeedbackMove(String feedback){
     check(isMyTurn() && currentMove == FEEDBACK);
     check(masterMindLogic.checkValidFeedback(feedback));
-    if (feedback.equals("4b0w") || (int)state.get(CURRENTTURN) == (int) state.get(MAXTURN)){
+    if (feedback.equals("4b0w") || (Integer)state.get(CURRENTTURN) == (Integer) state.get(MAXTURN)){
       this.sendFeedbackMoveVerify(feedback);
     } else {
       this.sendFeedbackMoveContinue(feedback);
@@ -272,6 +288,16 @@ public class MasterMindPresenter {
       winnerId = guesserId;
     }
     this.sendEndGameOperation(coderId, guesserId, winnerId);
+  }
+  
+  private boolean isWin(int yourPlayerId) {
+    int winnerId = coderId;
+    List<String> feedbackHistory = (List<String>) state.get(FEEDBACKHISTORY);
+    String lastFeedback = feedbackHistory.get(feedbackHistory.size()-1);
+    if (lastFeedback.equals("4b0w")) {
+      winnerId = guesserId;
+    }
+    return (yourPlayerId == winnerId);
   }
   
   /**

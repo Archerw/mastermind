@@ -43,6 +43,7 @@ public class MasterMindLogicTest {
   private static final String FEEDBACK = "FEEDBACK";
   private static final String VERIFY = "VERIFY";
   private final String CURRENTTURN = "CurrentTurn";
+  private final String END = "End";
   
   
   private final String CODELENGTH= "CodeLength";
@@ -940,6 +941,7 @@ public class MasterMindLogicTest {
         .build();
     List<Operation> operations = ImmutableList.<Operation>of(
         new SetTurn(wId),
+        new Set(CURRENTMOVE, END),
         new EndGame(wId));
     assertMoveOk(move(bId, state, operations));
   }
@@ -978,6 +980,7 @@ public class MasterMindLogicTest {
         .build();
     List<Operation> operations = ImmutableList.<Operation>of(
         new SetTurn(wId),
+        new Set(CURRENTMOVE, END),
         new EndGame(bId));
     assertMoveOk(move(bId, state, operations));
   }

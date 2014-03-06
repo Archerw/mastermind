@@ -14,6 +14,8 @@ import org.mastermind.client.GameApi.SetTurn;
 import org.mastermind.client.GameApi.SetVisibility;
 import org.mastermind.client.GameApi.VerifyMove;
 import org.mastermind.client.GameApi.VerifyMoveDone;
+import org.mastermind.client.Color;
+import org.mastermind.client.CodeFeedback;
 
 import com.google.common.collect.ImmutableList;
 
@@ -27,6 +29,7 @@ public class MasterMindLogic {
   private static final String FEEDBACK = "FEEDBACK";
   private static final String VERIFY = "VERIFY";
   private final String CURRENTTURN = "CurrentTurn";
+  private final String END = "End";
   
   
   private final String CODELENGTH= "CodeLength";
@@ -105,8 +108,8 @@ public class MasterMindLogic {
     String code = (String)((Set)lastMove.get(2)).getValue();
     List<Operation> codeMove = getCodeOperations(coderId, guesserId, code);
     check(lastMove.equals(codeMove),codeMove,lastMove);
-    check(code.length() == (int)lastState.get(CODELENGTH));
-    int maxDigit = (int)lastState.get(MAXDIGIT);
+    check(code.length() == (Integer)lastState.get(CODELENGTH));
+    int maxDigit = (Integer)lastState.get(MAXDIGIT);
     check(checkValidCode(code,maxDigit));
   }
   
@@ -141,8 +144,8 @@ public class MasterMindLogic {
     String guess = guessHistory.get(guessHistory.size()-1);
     List<Operation> guessMove = getGuessOperation(coderId, guesserId, guess, lastState);
     check(lastMove.equals(guessMove),guessMove,lastMove);
-    check(guess.length() == (int)lastState.get(CODELENGTH));
-    int maxDigit = (int)lastState.get(MAXDIGIT);
+    check(guess.length() == (Integer)lastState.get(CODELENGTH));
+    int maxDigit = (Integer)lastState.get(MAXDIGIT);
     check(checkValidCode(guess,maxDigit));
   }
   
@@ -169,13 +172,13 @@ public class MasterMindLogic {
     int coderId = verifyMove.getLastMovePlayerId();
     List<Integer> ids = verifyMove.getPlayerIds();
     int guesserId = getOtherPlayerId(ids,coderId);
-    int currentTurn = (int)lastState.get(CURRENTTURN);
-    int maxTurn = (int)lastState.get(MAXTURN);
+    int currentTurn = (Integer)lastState.get(CURRENTTURN);
+    int maxTurn = (Integer)lastState.get(MAXTURN);
     
     
     List<String> feedbackHistory = (List<String>)(((Set)lastMove.get(2)).getValue());
     String feedback = feedbackHistory.get(feedbackHistory.size()-1);
-    check(feedback.length() == (int)lastState.get(CODELENGTH));
+    check(feedback.length() == (Integer)lastState.get(CODELENGTH));
     check(checkValidFeedback(feedback));
     
     List<Operation> feedbackMove = getFeedbackOperationContinue(coderId, guesserId, feedback,
@@ -220,7 +223,7 @@ public class MasterMindLogic {
     checkGuessAndFeedbackMatch(guessHistory,feedbackHistory,code);
     
     List<Operation> validateMove = getSwitchcoderOperation(coderId, guesserId, lastState);
-    int lastCurrentGame = (int)lastState.get(CURRENTGAME);
+    int lastCurrentGame = (Integer)lastState.get(CURRENTGAME);
     
     if (lastCurrentGame == 2){
       String lastFeedback = feedbackHistory.get(feedbackHistory.size()-1);
@@ -258,8 +261,8 @@ public class MasterMindLogic {
 	    check(feedback.length() == 4);
 	    check(feedback.charAt(1) == 'b');
 	    check(feedback.charAt(3) == 'w');
-	    int b = (int)feedback.charAt(0) - '0';
-	    int w = (int)feedback.charAt(2) -'0';
+	    int b = feedback.charAt(0) - '0';
+	    int w = feedback.charAt(2) -'0';
 	    check(b <= CL && b >= 0);
 	    check(w <= CL && w >= 0);
 	    check(b+w <=CL && b+w >= 0);
@@ -340,7 +343,7 @@ public class MasterMindLogic {
     List<Operation> guessMove = new ArrayList<Operation>();
     guessMove.add(new SetTurn(coderId));
     guessMove.add(new Set(CURRENTMOVE,FEEDBACK));
-    guessMove.add(new Set(CURRENTTURN,(int)lastState.get(CURRENTTURN)+1));
+    guessMove.add(new Set(CURRENTTURN,(Integer)lastState.get(CURRENTTURN)+1));
     List<String> guessHistory = new ArrayList<String>();
     List<String> lastGuessHistory = (List<String>)(lastState.get(GUESSHISTORY));
     for (Iterator<String> it = lastGuessHistory.iterator(); it.hasNext();){
@@ -434,6 +437,7 @@ public class MasterMindLogic {
   List<Operation> getEndGameOperation(int coderId, int guesserId, int winnerId) {
     List<Operation> endMove = new ArrayList<Operation>();
     endMove.add(new SetTurn(guesserId));
+    endMove.add(new Set(CURRENTMOVE,END));
     endMove.add(new EndGame(winnerId));
     return endMove;
   }
