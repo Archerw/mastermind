@@ -14,11 +14,12 @@
   <!-- <inherits name='com.google.gwt.user.theme.dark.Dark'/>     -->
 
   <!-- Other module inherits                                      -->
-
+  <add-linker name='xsiframe' />
+  <inherits name='com.google.gwt.json.JSON'/>
   <!-- Specify the app entry point class.                         -->
   <entry-point class='org.mastermind.graphics.MasterMindEntryPoint'/>
 
   <!-- Specify the paths for translatable code                    -->
-  <source path='client'/>
-  <source path='graphics'/>
+  <source path='mastermind'/>
+  <source path='game_api'/>
 </module>

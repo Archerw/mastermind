@@ -3,10 +3,10 @@ package org.mastermind.client;
 import java.util.List;
 import java.util.Map;
 
-import org.mastermind.client.GameApi.Container;
-import org.mastermind.client.GameApi.Operation;
-import org.mastermind.client.GameApi.SetTurn;
-import org.mastermind.client.GameApi.UpdateUI;
+import org.game_api.GameApi.Container;
+import org.game_api.GameApi.Operation;
+import org.game_api.GameApi.SetTurn;
+import org.game_api.GameApi.UpdateUI;
 
 import com.google.common.base.Optional;
 
@@ -113,8 +113,8 @@ public class MasterMindPresenter {
   private Optional<Color> myColor;
   private Color turnOfColor;
   Map<String, Object> state;
-  private int guesserId;
-  private int coderId;
+  private String guesserId;
+  private String coderId;
   private String code = "    ";
   private String guess = "    ";
   private String feedback = "    ";
@@ -131,10 +131,10 @@ public class MasterMindPresenter {
    * @param updateUI
    */
   public void updateUI(UpdateUI updateUI){
-    List<Integer> playerIds = updateUI.getPlayerIds();
-    int yourPlayerId = updateUI.getYourPlayerId();
+    List<String> playerIds = updateUI.getPlayerIds();
+    String yourPlayerId = updateUI.getYourPlayerId();
     int yourPlayerIndex = updateUI.getPlayerIndex(yourPlayerId);
-    int otherPlayerId = yourPlayerIndex == 0 ? playerIds.get(1) : playerIds.get(0);
+    String otherPlayerId = yourPlayerIndex == 0 ? playerIds.get(1) : playerIds.get(0);
     myColor = yourPlayerIndex == 0 ? Optional.of(Color.W)
         : yourPlayerIndex == 1 ? Optional.of(Color.B) : Optional.<Color>absent();
     
@@ -281,7 +281,7 @@ public class MasterMindPresenter {
   @SuppressWarnings("unchecked")
   private void sendEndGameMove(){
     check(isMyTurn() && currentMove == VERIFY);
-    int winnerId = coderId;
+    String winnerId = coderId;
     List<String> feedbackHistory = (List<String>) state.get(FEEDBACKHISTORY);
     String lastFeedback = feedbackHistory.get(feedbackHistory.size()-1);
     if (lastFeedback.equals("4b0w")) {
@@ -290,8 +290,8 @@ public class MasterMindPresenter {
     this.sendEndGameOperation(coderId, guesserId, winnerId);
   }
   
-  private boolean isWin(int yourPlayerId) {
-    int winnerId = coderId;
+  private boolean isWin(String yourPlayerId) {
+  	String winnerId = coderId;
     List<String> feedbackHistory = (List<String>) state.get(FEEDBACKHISTORY);
     String lastFeedback = feedbackHistory.get(feedbackHistory.size()-1);
     if (lastFeedback.equals("4b0w")) {
@@ -304,39 +304,39 @@ public class MasterMindPresenter {
    * private methods that send move to container
    * 
    */
-  private void sendInitialMove(List<Integer> playerIds) {
+  private void sendInitialMove(List<String> playerIds) {
     container.sendMakeMove(masterMindLogic.getInitialOperations(playerIds));
   }
   
-  private void sendCodeOperation(int coderId, int guesserId, String code){
+  private void sendCodeOperation(String coderId, String guesserId, String code){
     container.sendMakeMove(masterMindLogic.getCodeOperations(coderId, guesserId, code));
   }
   
-  private void sendGuessOperation(int coderId, int guesserId, String guess,
+  private void sendGuessOperation(String coderId, String guesserId, String guess,
       Map<String, Object> lastState) {
     container.sendMakeMove(masterMindLogic.getGuessOperation(
         coderId, guesserId, guess, lastState));
   }
   
-  private void sendFeedbackOperationContinue(int coderId, int guesserId, String feedback,
+  private void sendFeedbackOperationContinue(String coderId, String guesserId, String feedback,
       Map<String, Object> lastState) {
     container.sendMakeMove(masterMindLogic.getFeedbackOperationContinue(
         coderId, guesserId, feedback, lastState));
   }
   
-  private void sendFeedbackOperationVerify(int coderId, int guesserId, String feedback,
+  private void sendFeedbackOperationVerify(String coderId, String guesserId, String feedback,
       Map<String, Object> lastState) {
     container.sendMakeMove(masterMindLogic.getFeedbackOperationVerify(
         coderId, guesserId, feedback, lastState));
   }
   
-  private void sendSwitchcoderOperation(int coderId, int guesserId, 
+  private void sendSwitchcoderOperation(String coderId, String guesserId, 
       Map<String, Object> lastState) {
     container.sendMakeMove(masterMindLogic.getSwitchcoderOperation(
         coderId, guesserId, lastState));
   }
   
-  private void sendEndGameOperation(int coderId, int guesserId, int winnerId) {
+  private void sendEndGameOperation(String coderId, String guesserId, String winnerId) {
     container.sendMakeMove(masterMindLogic.getEndGameOperation(
         coderId, guesserId, winnerId));
   }

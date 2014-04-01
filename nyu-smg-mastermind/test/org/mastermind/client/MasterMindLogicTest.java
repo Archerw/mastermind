@@ -6,14 +6,14 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.Test;
-import org.mastermind.client.GameApi.Delete;
-import org.mastermind.client.GameApi.EndGame;
-import org.mastermind.client.GameApi.Operation;
-import org.mastermind.client.GameApi.Set;
-import org.mastermind.client.GameApi.SetTurn;
-import org.mastermind.client.GameApi.SetVisibility;
-import org.mastermind.client.GameApi.VerifyMove;
-import org.mastermind.client.GameApi.VerifyMoveDone;
+import org.game_api.GameApi.Delete;
+import org.game_api.GameApi.EndGame;
+import org.game_api.GameApi.Operation;
+import org.game_api.GameApi.Set;
+import org.game_api.GameApi.SetTurn;
+import org.game_api.GameApi.SetVisibility;
+import org.game_api.GameApi.VerifyMove;
+import org.game_api.GameApi.VerifyMoveDone;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -31,8 +31,8 @@ public class MasterMindLogicTest {
   }
 
 
-  private final int wId = 41;
-  private final int bId = 42;
+  private final String wId = "41";
+  private final String bId = "42";
   private final String PLAYERID = "playerId";
   private final String GUESSHISTORY = "GuessHistory";
   private final String FEEDBACKHISTORY = "FeedbackHistory";
@@ -155,10 +155,10 @@ public class MasterMindLogicTest {
   }
   
   private VerifyMove move(
-      int lastMovePlayerId, Map<String, Object> lastState, List<Operation> lastMove) {
+      String lastMovePlayerId, Map<String, Object> lastState, List<Operation> lastMove) {
     return new VerifyMove(playersInfo,
         emptyState,
-        lastState, lastMove, lastMovePlayerId, ImmutableMap.<Integer, Integer>of());
+        lastState, lastMove, lastMovePlayerId, ImmutableMap.<String, Integer>of());
   }
   
   @Test
@@ -880,7 +880,7 @@ public class MasterMindLogicTest {
         new SetTurn(bId),
         new Set(CURRENTMOVE,VERIFY),
         new Set(FEEDBACKHISTORY, ImmutableList.<String>of("3b0w","3b0w")),
-        new SetVisibility((CODE), ImmutableList.<Integer>of(bId)));
+        new SetVisibility((CODE), ImmutableList.<String>of(bId)));
     assertHacker(move(bId, state, operations));
   }
   

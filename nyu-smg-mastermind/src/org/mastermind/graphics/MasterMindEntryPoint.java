@@ -1,10 +1,11 @@
 package org.mastermind.graphics;
 
-import org.mastermind.client.GameApi;
-import org.mastermind.client.GameApi.Game;
-import org.mastermind.client.GameApi.IteratingPlayerContainer;
-import org.mastermind.client.GameApi.UpdateUI;
-import org.mastermind.client.GameApi.VerifyMove;
+import org.game_api.GameApi;
+import org.game_api.GameApi.ContainerConnector;
+import org.game_api.GameApi.Game;
+import org.game_api.GameApi.IteratingPlayerContainer;
+import org.game_api.GameApi.UpdateUI;
+import org.game_api.GameApi.VerifyMove;
 import org.mastermind.client.MasterMindLogic;
 import org.mastermind.client.MasterMindPresenter;
 
@@ -16,7 +17,7 @@ import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.RootPanel;
 
 public class MasterMindEntryPoint implements EntryPoint {
-	IteratingPlayerContainer container;
+	ContainerConnector container;
   MasterMindPresenter masterMindPresenter;
   
   @Override
@@ -32,29 +33,29 @@ public class MasterMindEntryPoint implements EntryPoint {
         masterMindPresenter.updateUI(updateUI);
       }
     };
-    container = new IteratingPlayerContainer(game, 2);
+    container = new ContainerConnector(game);
+    container.sendGameReady();
     MasterMindGraphic MasterMindGraphics = new MasterMindGraphic();
     masterMindPresenter =
         new MasterMindPresenter(MasterMindGraphics, container);
-    final ListBox playerSelect = new ListBox();
-    playerSelect.addItem("WhitePlayer");
-    playerSelect.addItem("BlackPlayer");
-    playerSelect.addItem("Viewer");
-    playerSelect.addChangeHandler(new ChangeHandler() {
-      @Override
-      public void onChange(ChangeEvent event) {
-        int selectedIndex = playerSelect.getSelectedIndex();
-        int playerId = selectedIndex == 2 ? GameApi.VIEWER_ID
-            : container.getPlayerIds().get(selectedIndex);
-        container.updateUi(playerId);
-      }
-    });
+//    final ListBox playerSelect = new ListBox();
+//    playerSelect.addItem("WhitePlayer");
+//    playerSelect.addItem("BlackPlayer");
+//    playerSelect.addItem("Viewer");
+//    playerSelect.addChangeHandler(new ChangeHandler() {
+//      @Override
+//      public void onChange(ChangeEvent event) {
+//        int selectedIndex = playerSelect.getSelectedIndex();
+//        String playerId = selectedIndex == 2 ? GameApi.VIEWER_ID
+//            : container.getPlayerIds().get(selectedIndex);
+//        container.updateUi(playerId);
+//      }
+//    });
     FlowPanel flowPanel = new FlowPanel();
     flowPanel.add(MasterMindGraphics);
-    flowPanel.add(playerSelect);
     RootPanel.get("mainDiv").add(flowPanel);
-    container.sendGameReady();
-    container.updateUi(container.getPlayerIds().get(0));
+//    container.sendGameReady();
+//    container.updateUi(container.getPlayerIds().get(0));
   }
 
 }
