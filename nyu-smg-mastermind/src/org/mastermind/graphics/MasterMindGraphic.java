@@ -7,14 +7,27 @@ import org.mastermind.client.MasterMindPresenter;
 import org.mastermind.client.MasterMindPresenter.View;
 
 import com.google.gwt.core.shared.GWT;
+import com.google.gwt.dom.client.AudioElement;
+import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.DragLeaveEvent;
+import com.google.gwt.event.dom.client.DragLeaveHandler;
+import com.google.gwt.event.dom.client.DragOverEvent;
+import com.google.gwt.event.dom.client.DragOverHandler;
+import com.google.gwt.event.dom.client.DragStartEvent;
+import com.google.gwt.event.dom.client.DragStartHandler;
+import com.google.gwt.event.dom.client.DropEvent;
+import com.google.gwt.event.dom.client.DropHandler;
+import com.google.gwt.media.client.Audio;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.AbsolutePanel;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -42,6 +55,7 @@ public class MasterMindGraphic extends Composite implements View {
   private final String CODELENGTH= "CodeLength";
   private final String MAXTURN= "MaxTurn";
   private final String MAXDIGIT= "MaxDigit";
+  private static GameSounds gameSounds = GWT.create(GameSounds.class);
   
   
   @UiField
@@ -55,17 +69,26 @@ public class MasterMindGraphic extends Composite implements View {
   @UiField
   HorizontalPanel messageArea;
   @UiField
-  HorizontalPanel buttonArea = new HorizontalPanel();
+  AbsolutePanel buttonArea = new AbsolutePanel();
+  @UiField
+  HorizontalPanel dragArea = new HorizontalPanel();
   private boolean enableClicks = false;
   private MasterMindPresenter presenter;
   private String input = "";
   private Map<String, Object> state;
   private String currentState = ""; 
+  private Audio gameAudio;
   
   public MasterMindGraphic() {
     MasterMindGraphicsUiBinder uiBinder = GWT.create(MasterMindGraphicsUiBinder.class);
     initWidget(uiBinder.createAndBindUi(this));
     buildButtonArea();
+    buildDragArea();
+    //initAudio();
+    if (Audio.isSupported()) {
+      gameAudio = Audio.createIfSupported();
+      gameAudio.addSource(gameSounds.pieceDownMp3().getSafeUri().asString(), AudioElement.TYPE_MP3);
+    }
   }
   
   /**
@@ -95,7 +118,7 @@ public class MasterMindGraphic extends Composite implements View {
   
   private void updateInputArea() {
     String html;
-    if (currentState == this.FEEDBACK){
+    if (currentState == MasterMindGraphic.FEEDBACK){
       String b = this.input.length() > 0 ? this.input.substring(0, 1):" " ;
       String w = this.input.length() > 1 ? this.input.substring(1, 2):" ";
       html = "<div id = 'inputArea'> Input: "
@@ -116,25 +139,97 @@ public class MasterMindGraphic extends Composite implements View {
     this.messageArea.add(new HTMLPanel(
         "<div id = messagePanel>"+ s +" </div>"));
   }
+  private static Button [] aniBtn;
+  private static Button toMove = null;
   
   private void buildButtonArea() {
+    aniBtn = new Button[10];
+    for (int i = 0; i<10; i ++) {
+      final String optionF= String.valueOf(i);
+      aniBtn[i] = new Button(optionF);
+    }
     this.buttonArea.clear();
-    Button btn;
+    final Button btn1;
+    btn1 = new Button("DROP HERE");
     for (Integer i = 0; i < 10; i ++){
       final String optionF= i.toString();
-      btn = new Button(optionF);
+      final Button btn = new Button(optionF);
+      btn.getElement().setDraggable(Element.DRAGGABLE_TRUE);
       btn.addClickHandler(new ClickHandler(){
          @Override
           public void onClick(ClickEvent event) {
             if (enableClicks) {
-              inputAppend(optionF);
-              updateInputArea();
+              toMove = btn;
+              //inputAppend(optionF);
+              //updateInputArea();
+              gameAudio.play();
+              dropLabel.setText("CLICK DROP HERE BUTTON TO ENTER DIGIT");
+              
             }
           }
       });
+      btn.addDragStartHandler(new DragStartHandler() {
+        @Override
+        public void onDragStart(DragStartEvent event) {
+            event.setData("text", optionF);
+            dropLabel.setText("DROP THE DIGIT TO DROP HERE BUTTON");
+        }
+      });
       this.buttonArea.add(btn);
     }
+    //Drop button
+    btn1.addClickHandler(new ClickHandler(){
+       @Override
+       public void onClick(ClickEvent event) {
+         if (enableClicks && toMove != null) {
+           String s = toMove.getText();
+           startAnimation(toMove,btn1,aniBtn[Integer.parseInt(s)]);
+           inputAppend(s);
+           updateInputArea();
+           gameAudio.play();
+           toMove = null;
+           dropLabel.setText("INPUT RECEIVED");
+         }
+       }
+    });
+    btn1.addDragOverHandler(new DragOverHandler() {
+      @Override
+      public void onDragOver(DragOverEvent event) {
+        dropLabel.setText("DROP TO ENTER DIGIT");
+      }
+    });
+   
+    btn1.addDropHandler(new DropHandler() {
+      @Override
+      public void onDrop(DropEvent event) {
+          // prevent the native text drop
+          event.preventDefault();
+   
+          // get the data out of the event
+          String data = event.getData("text");
+          if (enableClicks) {
+            dropLabel.setText("INPUT RECEIVED");
+            inputAppend(data);
+            updateInputArea();
+            gameAudio.play();
+          } else {
+            dropLabel.setText("INPUT DISABLE:NOT YOUR TURN");
+          }
+      }
+    });
+    
+    btn1.addDomHandler(new DragLeaveHandler()
+    {
+        @Override
+        public void onDragLeave(DragLeaveEvent event)
+        {
+          dropLabel.setText("DROP TO RELEASE");
+        }
+    }, DragLeaveEvent.getType());
+    
+    this.buttonArea.add(btn1);
     //Delete button
+    Button btn;
     btn = new Button("DELETE");
     btn.addClickHandler(new ClickHandler(){
        @Override
@@ -165,7 +260,7 @@ public class MasterMindGraphic extends Composite implements View {
          if (enableClicks) {
           if (currentState == FEEDBACK) {
             if (checkValidFeedbackInput(input)) {
-            	updateMessageArea("Feedback Send, it is opponent turn");
+              updateMessageArea("Feedback Send, it is opponent turn");
               presenter.sendFeedbackMove(getFormatFeedback(input));
               enableClicks = false;
             } else {
@@ -173,16 +268,16 @@ public class MasterMindGraphic extends Composite implements View {
             }
           } else if (currentState == CODE) {
             if (checkValidCodeInput(input)) {
-            	updateMessageArea("Code Send, it is opponent turn");
-            	presenter.sendCodeMove(input);
+              updateMessageArea("Code Send, it is opponent turn");
+              presenter.sendCodeMove(input);
               enableClicks = false;
             } else {
               updateMessageArea("Illegal Code, please try again");
             }
           } else {
             if (checkValidCodeInput(input)) {
-            	updateMessageArea("Guess Send, it is opponent turn");
-            	presenter.sendGuessMove(input);
+              updateMessageArea("Guess Send, it is opponent turn");
+              presenter.sendGuessMove(input);
               enableClicks = false;
             } else {
               updateMessageArea("Illegal Guess, please try again");
@@ -246,8 +341,8 @@ public class MasterMindGraphic extends Composite implements View {
         "" : ((Integer)state.get(this.MAXTURN)).toString();
     String currentTurn = ((Integer)state.get(this.CURRENTTURN)).toString() == null?
         "" : ((Integer)state.get(this.CURRENTTURN)).toString();
-    String code = ((String)state.get(this.CODE)) == null?
-        "" : ((String)state.get(this.CODE));
+    String code = ((String)state.get(MasterMindGraphic.CODE)) == null?
+        "" : ((String)state.get(MasterMindGraphic.CODE));
     String html = "<div id = 'infoPanel'>"
         + "<div class='panelTitle'>Info Panel</div>"
         + "<div><span class = 'InfoEntryKey'>Allowed Maximum Digit: </span>"
@@ -269,7 +364,7 @@ public class MasterMindGraphic extends Composite implements View {
   
   private void inputAppend(String s){
     int maxLength = 4;
-    if (currentState == this.FEEDBACK) {
+    if (currentState == MasterMindGraphic.FEEDBACK) {
       maxLength = 2;
     }
     if (input.length() < maxLength) {
@@ -406,4 +501,17 @@ public class MasterMindGraphic extends Composite implements View {
     }
     this.enableClicks = false;
   }
+  
+  final Label dropLabel = new Label("DROP");
+    
+  private void buildDragArea() {
+    this.dragArea.add(dropLabel);
+  }
+  //Animation
+  
+  public void startAnimation(Widget start, Widget end,Widget move) {
+    WidgetAnimation wd = new WidgetAnimation(start,end,move);
+    wd.run(1000);
+  }
+  
 }

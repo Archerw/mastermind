@@ -9,6 +9,7 @@
     </g:HorizontalPanel>
     <g:HorizontalPanel height="20px" width="650px" ui:field="inputInfoArea"/>
     <g:HorizontalPanel height="20px" width="650px" ui:field="messageArea"/>
-    <g:HorizontalPanel height="40px" width="650px" ui:field="buttonArea" />
+    <g:AbsolutePanel height="100px" width="650px" ui:field="buttonArea" />
+    <g:HorizontalPanel height="200px" width="650px" ui:field="dragArea" />
   </g:VerticalPanel>
 </ui:UiBinder> 
