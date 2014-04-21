@@ -6,6 +6,8 @@ import java.util.Map;
 import org.mastermind.client.MasterMindPresenter;
 import org.mastermind.client.MasterMindPresenter.View;
 
+import com.allen_sauer.gwt.voices.client.Sound;
+import com.allen_sauer.gwt.voices.client.SoundController;
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.dom.client.AudioElement;
 import com.google.gwt.dom.client.Element;
@@ -78,13 +80,17 @@ public class MasterMindGraphic extends Composite implements View {
   private Map<String, Object> state;
   private String currentState = ""; 
   private Audio gameAudio;
+  private SoundController soundController;
+  private Sound sound;
   
   public MasterMindGraphic() {
     MasterMindGraphicsUiBinder uiBinder = GWT.create(MasterMindGraphicsUiBinder.class);
     initWidget(uiBinder.createAndBindUi(this));
     buildButtonArea();
     buildDragArea();
-    //initAudio();
+    this.soundController = new SoundController();
+    this.sound = soundController.createSound(Sound.MIME_TYPE_AUDIO_MPEG_MP3,
+        "sounds/pieceDown.mp3", false, false);
     if (Audio.isSupported()) {
       gameAudio = Audio.createIfSupported();
       gameAudio.addSource(gameSounds.pieceDownMp3().getSafeUri().asString(), AudioElement.TYPE_MP3);
@@ -162,7 +168,7 @@ public class MasterMindGraphic extends Composite implements View {
               toMove = btn;
               //inputAppend(optionF);
               //updateInputArea();
-              gameAudio.play();
+              sound.play();
               dropLabel.setText("DIGIT "+optionF+
                   " RECEIVED, CLICK DROP HERE BUTTON TO ENTER DIGIT");
               
@@ -188,7 +194,7 @@ public class MasterMindGraphic extends Composite implements View {
            startAnimation(toMove,btn1,aniBtn[Integer.parseInt(s)]);
            inputAppend(s);
            updateInputArea();
-           gameAudio.play();
+           sound.play();
            toMove = null;
            dropLabel.setText("INPUT RECEIVED");
          }
