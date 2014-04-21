@@ -2,13 +2,19 @@
 <html>
   <head>
     <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no">
     <link type="text/css" rel="stylesheet" href="Nyu_smg_mastermind.css">
     <title>Master Mind Game</title>
     <script type="text/javascript" language="javascript" src="nyu_smg_mastermind/nyu_smg_mastermind.nocache.js"></script>
+    <script type="text/javascript">
+    document.addEventListener('touchmove', function(e) {
+    e.preventDefault();
+    }, false);
+    </script>
     <style type="text/css">
     .panelTitle {
       color:#333333;
-      font-size:20px;
+      font-size:16px;
       font-weight:300;
       text-align:center;
       
@@ -16,22 +22,22 @@
     
     .GuessEntry {
       color:#29a9d8;
-      font-size:16px;
+      font-size:12px;
       text-align:center;
       
     }
     .FeedbackEntry {
       color:#55c362;
-      font-size:16px;
+      font-size:12px;
       text-align:center;
       
     }
     .InfoEntryKey {
-      font-size:16px;
+      font-size:12px;
     }
     .InfoEntryValue {
       float:right;
-      font-size:16px;
+      font-size:12px;
     }
     #messagePanel {
       text-align:center;

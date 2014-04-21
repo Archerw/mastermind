@@ -163,7 +163,8 @@ public class MasterMindGraphic extends Composite implements View {
               //inputAppend(optionF);
               //updateInputArea();
               gameAudio.play();
-              dropLabel.setText("CLICK DROP HERE BUTTON TO ENTER DIGIT");
+              dropLabel.setText("DIGIT "+optionF+
+                  " RECEIVED, CLICK DROP HERE BUTTON TO ENTER DIGIT");
               
             }
           }
@@ -172,7 +173,8 @@ public class MasterMindGraphic extends Composite implements View {
         @Override
         public void onDragStart(DragStartEvent event) {
             event.setData("text", optionF);
-            dropLabel.setText("DROP THE DIGIT TO DROP HERE BUTTON");
+            dropLabel.setText("DIGIT "+optionF+
+                " RECEIVED, DROP THE DIGIT TO DROP HERE BUTTON");
         }
       });
       this.buttonArea.add(btn);
@@ -297,7 +299,7 @@ public class MasterMindGraphic extends Composite implements View {
   private HTMLPanel createGuessPanel(List<String> history) {
     StringBuilder htmlBuilder = new StringBuilder();
     htmlBuilder.append("<div id = 'guessHistoryPanel'>"
-        + "<div class='panelTitle'>Guess History</div>");
+        + "<div class='panelTitle'>Guess</div>");
     for (String h : history) {
       htmlBuilder.append("<div class='GuessEntry'>"+h+"</div>");
     }
@@ -315,7 +317,7 @@ public class MasterMindGraphic extends Composite implements View {
   private HTMLPanel createFeedbackPanel(List<String> history) {
     StringBuilder htmlBuilder = new StringBuilder();
     htmlBuilder.append("<div id = 'feedbackHistoryPanel'>"
-        + "<div class='panelTitle'>Feedback History</div>");
+        + "<div class='panelTitle'>Feedback</div>");
     for (String h : history) {
       htmlBuilder.append("<div class='FeedbackEntry'>"+h+"</div>");
     }
@@ -345,15 +347,13 @@ public class MasterMindGraphic extends Composite implements View {
         "" : ((String)state.get(MasterMindGraphic.CODE));
     String html = "<div id = 'infoPanel'>"
         + "<div class='panelTitle'>Info Panel</div>"
-        + "<div><span class = 'InfoEntryKey'>Allowed Maximum Digit: </span>"
+        + "<div><span class = 'InfoEntryKey'>Max Digit: </span>"
         + "<span class = 'InfoEntryValue'>"+ maxdigit + "</span> </div>"
         + "<div><span class = 'InfoEntryKey'>Code length: </span>"
         + "<span class = 'InfoEntryValue'>"+ codeLength + " </div>"
-        + "<div><span class = 'InfoEntryKey'>Allowed Maximum Guess: </span>"
-        + "<span class = 'InfoEntryValue'>"+ maxTurn + " </div>"
-        + "<div><span class = 'InfoEntryKey'>Guess Attempted: </span>"
-        + "<span class = 'InfoEntryValue'>"+ currentTurn + " </div>"
-        + "<div><span class = 'InfoEntryKey'>Current Move: </span>"
+        + "<div><span class = 'InfoEntryKey'>Guess: </span>"
+        + "<span class = 'InfoEntryValue'>"+ currentTurn + "/"+ maxTurn +" </div>"
+        + "<div><span class = 'InfoEntryKey'>Stage: </span>"
         + "<span class = 'InfoEntryValue'>"+ currentMove + " </div>"
         + "<div><span class = 'InfoEntryKey'>Code: </span>"
         + "<span class = 'InfoEntryValue'>"+ code + " </div>"

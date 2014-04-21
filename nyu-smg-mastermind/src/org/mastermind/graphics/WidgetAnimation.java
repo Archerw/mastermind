@@ -16,7 +16,7 @@ public class WidgetAnimation extends Animation{
   int endX, endY;
   Audio soundAtEnd;
   boolean cancelled;
-  private final static int yOffset = 60;
+  private final static int yOffset = 40;
 
   public WidgetAnimation(Widget startWidget, Widget endWidget, Widget move
                   //ImageResource startRes, ImageResource endRes, ImageResource blankRes, 
