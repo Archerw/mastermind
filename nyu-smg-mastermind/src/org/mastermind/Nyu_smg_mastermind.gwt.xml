@@ -11,6 +11,8 @@
   <inherits name='com.google.gwt.user.theme.clean.Clean'/>
   <inherits name='com.allen_sauer.gwt.dnd.gwt-dnd'/>
   <inherits name='com.allen_sauer.gwt.voices.gwt-voices'/>
+  <inherits name="com.google.gwt.i18n.I18N"/>
+  <extend-property name="locale" values="zh" />
   <!-- <inherits name='com.google.gwt.user.theme.standard.Standard'/> -->
   <!-- <inherits name='com.google.gwt.user.theme.chrome.Chrome'/> -->
   <!-- <inherits name='com.google.gwt.user.theme.dark.Dark'/>     -->
@@ -23,4 +25,5 @@
   <!-- Specify the paths for translatable code                    -->
   <source path='client'/>
   <source path='graphics'/>
+  <source path='i18n'/>
 </module>
