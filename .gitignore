@@ -47,3 +47,9 @@ gwt-unitCache/
 # more caches and things from deploy #
 war/WEB-INF/deploy/
 war/WEB-INF/classes/
+nyu-smg-mastermind/war/nyu_smg_mastermind/gwt/clean/clean.css
+nyu-smg-mastermind/war/nyu_smg_mastermind/gwt/clean/clean_rtl.css
+nyu-smg-mastermind/war/nyu_smg_mastermind/nyu_smg_mastermind.nocache.js
+nyu-smg-mastermind/war/WEB-INF/deploy/nyu_smg_mastermind/rpcPolicyManifest/manifest.txt
+nyu-smg-mastermind/war/WEB-INF/appengine-web.xml
+nyu-smg-mastermind/war/nyu_smg_mastermind/hosted.html
