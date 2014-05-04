@@ -155,6 +155,66 @@ public class MasterMindPresenter {
     
     if (updateUI.isAiPlayer()) {
       // TODO: implement AI in a later HW!
+      
+      //Determine role
+      int currentGame = (Integer)state.get(CURRENTGAME);
+      if ((currentGame+yourPlayerIndex) % 2 == 0){
+        this.guesserId = yourPlayerId;
+        this.coderId = otherPlayerId;
+      } else {
+        this.coderId = yourPlayerId;
+        this.guesserId = otherPlayerId;
+      }
+      //Player Display
+      
+      if (this.coderId == yourPlayerId){
+        //Coder
+        if (CODE == state.get(CURRENTMOVE)) {
+          // Code state
+          this.code = "    ";
+          view.setCoderStateCode(state);
+          if (isMyTurn()){
+            currentMove = CODE;
+            //AI CODE
+            this.sendCodeMove("1111");
+          }
+        } else if (VERIFY == state.get(CURRENTMOVE)){
+          //Subgame end and verify is done
+          currentMove = VERIFY;
+          view.setCoderStateFeedback(state);
+          if (isMyTurn()){
+            if ((Integer)state.get(CURRENTGAME) == 1){
+              this.sendSwitchcoderMove();
+            } else {
+              this.sendEndGameMove();
+            }
+          }
+        } else if (FEEDBACK == state.get(CURRENTMOVE)){
+          //TODO calculate feedback Directly
+          currentMove = FEEDBACK;
+          this.feedback = "    ";
+          view.setCoderStateFeedback(state);
+          if (isMyTurn()){
+            //AI FEEDBACK
+            String code = (String) state.get(CODE);
+            List<String> guessHistoryList = (List<String>) state.get(GUESSHISTORY);
+            String guess = guessHistoryList.get(guessHistoryList.size()-1);
+            String feedback = CodeFeedback.getValidFeedback(code, guess);
+            this.sendFeedbackMove(feedback);
+          }
+        } else {
+          view.setCoderStateFeedback(state);
+        }
+      } else {
+      //Guesser
+        this.guess = "    ";
+        currentMove = GUESS;
+        view.setGuesserState(state);
+        if (isMyTurn()){
+          //AI Guess
+          this.sendGuessMove("0000");
+        }
+      }
       //container.sendMakeMove(..);
       return;
     }
