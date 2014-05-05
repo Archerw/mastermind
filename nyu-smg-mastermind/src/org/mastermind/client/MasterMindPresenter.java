@@ -35,6 +35,7 @@ public class MasterMindPresenter {
   private final int MT = 10;
   private final String MAXDIGIT= "MaxDigit";
   private final int MD = 9;
+  private MasterMindAI ai = new MasterMindAI();
   
   public interface View {
     /**
@@ -176,7 +177,8 @@ public class MasterMindPresenter {
           if (isMyTurn()){
             currentMove = CODE;
             //AI CODE
-            this.sendCodeMove("1111");
+            this.sendCodeMove(ai.generateCode((Integer)state.get(CODELENGTH),
+                (Integer)state.get(MAXDIGIT)));
           }
         } else if (VERIFY == state.get(CURRENTMOVE)){
           //Subgame end and verify is done
@@ -212,10 +214,12 @@ public class MasterMindPresenter {
         view.setGuesserState(state);
         if (isMyTurn()){
           //AI Guess
-          this.sendGuessMove("0000");
+          ai.init();
+          ai.filter((List<String>)state.get(GUESSHISTORY),
+              (List<String>)state.get(FEEDBACKHISTORY));
+          this.sendGuessMove(ai.generateGuess());
         }
       }
-      //container.sendMakeMove(..);
       return;
     }
     
@@ -318,7 +322,8 @@ public class MasterMindPresenter {
   public void sendFeedbackMove(String feedback){
     check(isMyTurn() && currentMove == FEEDBACK);
     check(masterMindLogic.checkValidFeedback(feedback));
-    if (feedback.equals("4b0w") || (Integer)state.get(CURRENTTURN) == (Integer) state.get(MAXTURN)){
+    if (feedback.equals("4b0w") 
+        || ((List<String>)state.get(GUESSHISTORY)).size() == (Integer) state.get(MAXTURN)){
       this.sendFeedbackMoveVerify(feedback);
     } else {
       this.sendFeedbackMoveContinue(feedback);
