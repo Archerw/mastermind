@@ -466,6 +466,8 @@ public class MasterMindGraphic extends Composite implements View {
   @Override
   public void startFeedback(String feedback) {
     this.updateMessageArea(constants.StartFeedback());
+    this.input = ""+feedback.charAt(0)+feedback.charAt(2);
+    updateInputArea();
     this.enableClicks = true;
   }
 

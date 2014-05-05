@@ -35,7 +35,8 @@ public class MasterMindPresenter {
   private final int MT = 10;
   private final String MAXDIGIT= "MaxDigit";
   private final int MD = 9;
-  private MasterMindAI ai = new MasterMindAI();
+  private final int aiLevel = 3;
+  private MasterMindAI ai = new MasterMindAI(aiLevel);
   
   public interface View {
     /**
@@ -262,9 +263,12 @@ public class MasterMindPresenter {
       } else if (FEEDBACK == state.get(CURRENTMOVE)){
         //TODO calculate feedback Directly
         currentMove = FEEDBACK;
-        this.feedback = "    ";
         view.setCoderStateFeedback(state);
         if (isMyTurn()){
+          String code = (String) state.get(CODE);
+          List<String> guessHistoryList = (List<String>) state.get(GUESSHISTORY);
+          String guess = guessHistoryList.get(guessHistoryList.size()-1);
+          this.feedback = CodeFeedback.getValidFeedback(code, guess);
           view.startFeedback(feedback);
         }
       } else {

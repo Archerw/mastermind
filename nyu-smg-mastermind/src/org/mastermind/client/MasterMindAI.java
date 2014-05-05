@@ -5,16 +5,33 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
-import com.google.gwt.i18n.client.NumberFormat;
-
 public class MasterMindAI {
   private List<String> possibleAnswer = new ArrayList<String>();
   private Random random = new Random();
+  private int level;
+  private final int maxlvl = 5;
+  private final int lvlpad = 2;
   
-  public MasterMindAI() {
+  /**
+   * Generate an AI
+   * @param level a parameter indicate how good is the ai, should be from 0 to 5, parameter will
+   * be adjusted if out of range
+   */
+  public MasterMindAI(int level) {
+    int i = level;
+    if (i > 5) {
+      i = 5;
+    }
+    if (i < 0 ) {
+      i = 0;
+    }
+    this.level = level;
     init();
   }
   
+  /**
+   * Initial AI
+   */
   public void init() {
     //TODO generate general init
     //String.format() cannot be used in GWT
@@ -29,6 +46,11 @@ public class MasterMindAI {
     }
   }
   
+  /**
+   * filter out impossible answers with guess and feedback history
+   * @param guessHistory
+   * @param feedbackHistory
+   */
   public void filter(List<String> guessHistory, List<String> feedbackHistory) {
     Iterator<String> it = possibleAnswer.iterator();
     while (it.hasNext()){
@@ -39,14 +61,22 @@ public class MasterMindAI {
         }
         String temp = CodeFeedback.getValidFeedback(code, guessHistory.get(i));
         if (!temp.equals(feedbackHistory.get(i))){
-          it.remove();
-          break;
+          int r = random.nextInt(maxlvl+lvlpad) - lvlpad;
+          if (r < this.level) {
+            it.remove();
+            break;
+          }
         }
       }
-      System.out.println(code);
     }
   }
   
+  /**
+   * generate a random code
+   * @param length
+   * @param maxInt
+   * @return
+   */
   public String generateCode(int length, int maxInt){
     StringBuffer sb = new StringBuffer();
     for (int i = 0; i < length; ++ i) {
@@ -55,26 +85,30 @@ public class MasterMindAI {
     return sb.toString();
   }
   
+  /**
+   * generate a guess
+   * @return
+   */
   public String generateGuess(){
     return possibleAnswer.get(random.nextInt(possibleAnswer.size()));
   }
-
+  
   public static void main(String[] args){
-    MasterMindAI ai = new MasterMindAI();
-//    System.out.println(ai.generateCode(4, 9));
-//    System.out.println(ai.generateCode(2, 3));
-//    System.out.println(ai.generateCode(2, 3));
-//    String code = "8888";
-//    List<String> guessHistory = new ArrayList<String>();
-//    List<String> feedbackHistory = new ArrayList<String>();
-//    for (int i = 0; i < 6; i ++){
-//      String guess = ai.generateGuess();
-//      guessHistory.add(guess);
-//      feedbackHistory.add(CodeFeedback.getValidFeedback(code, guess));
-//      ai.filter(guessHistory, feedbackHistory);
-//    }
-//    System.out.println("===");
-//    ai.filter(guessHistory, feedbackHistory);
-//    
+    MasterMindAI ai = new MasterMindAI(0);
+    System.out.println(ai.generateCode(4, 9));
+    System.out.println(ai.generateCode(2, 3));
+    System.out.println(ai.generateCode(2, 3));
+    String code = "8888";
+    List<String> guessHistory = new ArrayList<String>();
+    List<String> feedbackHistory = new ArrayList<String>();
+    for (int i = 0; i < 10; i ++){
+      String guess = ai.generateGuess();
+      guessHistory.add(guess);
+      feedbackHistory.add(CodeFeedback.getValidFeedback(code, guess));
+      ai.filter(guessHistory, feedbackHistory);
+    }
+    System.out.println("===");
+    System.out.println(ai.generateGuess());
+    
   }
 }
