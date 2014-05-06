@@ -172,7 +172,7 @@ public class MasterMindGraphic extends Composite implements View {
     }
     this.buttonArea.clear();
     this.buttonArea2.clear();
-    this.buttonArea2.setHeight("80px");
+    this.buttonArea2.setHeight("90px");
     final DropButton btn1;
     btn1 = new DropButton(constants.DROPHERE());
     DropController dropController = new AreaDropController(buttonArea2);

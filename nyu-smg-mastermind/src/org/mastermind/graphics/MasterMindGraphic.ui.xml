@@ -2,7 +2,7 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
   xmlns:g="urn:import:com.google.gwt.user.client.ui">
   <g:VerticalPanel>
-    <g:HorizontalPanel width="100%" height="172px">
+    <g:HorizontalPanel width="100%" height="190px">
       <g:cell width="30%">
         <g:VerticalPanel width="100%" ui:field="historyArea"/>
       </g:cell>
@@ -15,7 +15,7 @@
     </g:HorizontalPanel>
     <g:HorizontalPanel height="18px" width="100%" ui:field="inputInfoArea"/>
     <g:HorizontalPanel height="18px" width="100%" ui:field="messageArea"/>
-    <g:AbsolutePanel height="80px" width="100%" ui:field="buttonArea" />
+    <g:AbsolutePanel height="90px" width="100%" ui:field="buttonArea" />
     <g:HorizontalPanel height="36px" width="100%" ui:field="dragArea" />
   </g:VerticalPanel>
 </ui:UiBinder> 

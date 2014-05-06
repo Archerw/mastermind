@@ -9,8 +9,6 @@ public class MasterMindAI {
   private List<String> possibleAnswer = new ArrayList<String>();
   private Random random = new Random();
   private int level;
-  private final int maxlvl = 5;
-  private final int lvlpad = 2;
   
   /**
    * Generate an AI
@@ -25,7 +23,7 @@ public class MasterMindAI {
     if (i < 0 ) {
       i = 0;
     }
-    this.level = level;
+    this.level = (level+5)*500;
     init();
   }
   
@@ -53,20 +51,18 @@ public class MasterMindAI {
    */
   public void filter(List<String> guessHistory, List<String> feedbackHistory) {
     Iterator<String> it = possibleAnswer.iterator();
-    while (it.hasNext()){
+    int i = feedbackHistory.size() - 1;
+    if (i >= guessHistory.size()){
+      return;
+    }
+    String gs = guessHistory.get(i);
+    String fb = feedbackHistory.get(i);
+    for (int count = 0; count < level && it.hasNext(); count++) {
       String code = it.next();
-      for (int i = 0; i < feedbackHistory.size(); i ++) {
-        if (i >= guessHistory.size()){
-          break;
-        }
-        String temp = CodeFeedback.getValidFeedback(code, guessHistory.get(i));
-        if (!temp.equals(feedbackHistory.get(i))){
-          int r = random.nextInt(maxlvl+lvlpad) - lvlpad;
-          if (r < this.level) {
-            it.remove();
-            break;
-          }
-        }
+      String temp = CodeFeedback.getValidFeedback(code, gs);
+      if (!temp.equals(fb)){
+        it.remove();
+        continue;
       }
     }
   }
@@ -94,11 +90,8 @@ public class MasterMindAI {
   }
   
   public static void main(String[] args){
-    MasterMindAI ai = new MasterMindAI(0);
-    System.out.println(ai.generateCode(4, 9));
-    System.out.println(ai.generateCode(2, 3));
-    System.out.println(ai.generateCode(2, 3));
-    String code = "8888";
+    MasterMindAI ai = new MasterMindAI(3);
+    String code = "1357";
     List<String> guessHistory = new ArrayList<String>();
     List<String> feedbackHistory = new ArrayList<String>();
     for (int i = 0; i < 10; i ++){
@@ -108,6 +101,8 @@ public class MasterMindAI {
       ai.filter(guessHistory, feedbackHistory);
     }
     System.out.println("===");
+    System.out.println(guessHistory);
+    System.out.println(feedbackHistory);
     System.out.println(ai.generateGuess());
     
   }

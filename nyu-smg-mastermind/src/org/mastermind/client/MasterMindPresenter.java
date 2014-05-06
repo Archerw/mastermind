@@ -215,9 +215,13 @@ public class MasterMindPresenter {
         view.setGuesserState(state);
         if (isMyTurn()){
           //AI Guess
-          ai.init();
-          ai.filter((List<String>)state.get(GUESSHISTORY),
-              (List<String>)state.get(FEEDBACKHISTORY));
+          List<String> guessHistory = (List<String>)state.get(GUESSHISTORY);
+          List<String> feedbackHistory = (List<String>)state.get(FEEDBACKHISTORY);
+          if (guessHistory.size() == 0) {
+            ai.init();
+          } else {
+            ai.filter(guessHistory, feedbackHistory);
+          }
           this.sendGuessMove(ai.generateGuess());
         }
       }
