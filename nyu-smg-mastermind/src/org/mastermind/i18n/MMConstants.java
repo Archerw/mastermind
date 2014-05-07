@@ -95,7 +95,7 @@ public interface MMConstants extends Constants {
   @DefaultStringValue("DIGIT ")
   public String SELECTFIRST();
   
-  @DefaultStringValue(" RECEIVED, DROP THE DIGIT TO DROP HERE BUTTON")
+  @DefaultStringValue(" RECEIVED")
   public String SELETESECOND();
 
   

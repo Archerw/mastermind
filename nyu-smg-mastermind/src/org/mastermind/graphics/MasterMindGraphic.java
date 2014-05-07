@@ -7,30 +7,12 @@ import org.mastermind.client.MasterMindPresenter;
 import org.mastermind.client.MasterMindPresenter.View;
 import org.mastermind.i18n.MMConstants;
 
-import com.allen_sauer.gwt.dnd.client.DragContext;
 import com.allen_sauer.gwt.dnd.client.PickupDragController;
-import com.allen_sauer.gwt.dnd.client.VetoDragException;
-import com.allen_sauer.gwt.dnd.client.drop.AbsolutePositionDropController;
-import com.allen_sauer.gwt.dnd.client.drop.DropController;
-import com.allen_sauer.gwt.dnd.client.drop.SimpleDropController;
 import com.allen_sauer.gwt.voices.client.Sound;
 import com.allen_sauer.gwt.voices.client.SoundController;
 import com.google.gwt.core.shared.GWT;
-import com.google.gwt.dom.client.AudioElement;
-import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.DragLeaveEvent;
-import com.google.gwt.event.dom.client.DragLeaveHandler;
-import com.google.gwt.event.dom.client.DragOverEvent;
-import com.google.gwt.event.dom.client.DragOverHandler;
-import com.google.gwt.event.dom.client.DragStartEvent;
-import com.google.gwt.event.dom.client.DragStartHandler;
-import com.google.gwt.event.dom.client.DropEvent;
-import com.google.gwt.event.dom.client.DropHandler;
-import com.google.gwt.event.dom.client.TouchStartEvent;
-import com.google.gwt.event.dom.client.TouchStartHandler;
-import com.google.gwt.media.client.Audio;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.AbsolutePanel;
@@ -39,7 +21,6 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -85,8 +66,6 @@ public class MasterMindGraphic extends Composite implements View {
   @UiField
   HorizontalPanel dragArea = new HorizontalPanel();
   
-  private PickupDragController dragController;
-  DragButtonPanel buttonArea2 = new DragButtonPanel(dragController);
   private boolean enableClicks = false;
   private MasterMindPresenter presenter;
   private String input = "";
@@ -110,6 +89,7 @@ public class MasterMindGraphic extends Composite implements View {
    * 
    */
   private void showHistoryArea(Map<String, Object> state) {
+    @SuppressWarnings("unchecked")
     List<String> guessHistory = (List<String>)state.get(GUESSHISTORY);
     this.historyArea.clear();
     if (guessHistory != null){
@@ -118,6 +98,7 @@ public class MasterMindGraphic extends Composite implements View {
   }
   
   private void showFeedbackArea(Map<String, Object> state) {
+    @SuppressWarnings("unchecked")
     List<String> feedbackHistory = (List<String>)state.get(FEEDBACKHISTORY);
     this.feedbackArea.clear();
     if (feedbackHistory != null){
@@ -153,53 +134,14 @@ public class MasterMindGraphic extends Composite implements View {
     this.messageArea.add(new HTMLPanel(
         "<div id = messagePanel>"+ s +" </div>"));
   }
-  private static Button [] aniBtn;
-  private static Button toMove = null;
-  private static Button toTouch = null;
   
   private void buildButtonArea() {
-    dragController = new PickupDragController(buttonArea, true);
-    dragController.setBehaviorMultipleSelection(false);
-    dragController.setBehaviorDragProxy(false);
-    dragController.setBehaviorConstrainedToBoundaryPanel(true);
-    dragController.setBehaviorDragStartSensitivity(3);
-    this.buttonArea2.setDragController(dragController);
-    
-    aniBtn = new Button[10];
-    for (int i = 0; i<10; i ++) {
-      final String optionF= String.valueOf(i);
-      aniBtn[i] = new Button(optionF);
-    }
     this.buttonArea.clear();
-    this.buttonArea2.clear();
-    this.buttonArea2.setHeight("90px");
-    final DropButton btn1;
-    btn1 = new DropButton(constants.DROPHERE());
-    DropController dropController = new AreaDropController(buttonArea2);
-    dragController.registerDropController(new ButtonDropController(btn1));
-    dragController.registerDropController(dropController);
     for (Integer i = 0; i < 10; i ++){
       final String optionF= i.toString();
       final DragButton btn = new DragButton(optionF);
-      this.buttonArea2.add(btn);
+      this.buttonArea.add(btn);
     }
-    //Drop button
-    btn1.addClickHandler(new ClickHandler(){
-       @Override
-       public void onClick(ClickEvent event) {
-         if (enableClicks && toMove != null) {
-           String s = toMove.getText();
-           startAnimation(toMove,btn1,aniBtn[Integer.parseInt(s)]);
-           inputAppend(s);
-           updateInputArea();
-           sound.play();
-           toMove = null;
-           dropLabel.setText(constants.InputReceived());
-         }
-       }
-    });
-
-    this.buttonArea2.add(btn1);
     //Delete button
     Button btn;
     btn = new Button(constants.DELETE());
@@ -212,7 +154,7 @@ public class MasterMindGraphic extends Composite implements View {
          }
        }
     });
-    this.buttonArea2.add(btn);
+    this.buttonArea.add(btn);
     //Clear button
     btn = new Button(constants.CLEAR());
     btn.addClickHandler(new ClickHandler(){
@@ -224,7 +166,7 @@ public class MasterMindGraphic extends Composite implements View {
          }
        }
     });
-    this.buttonArea2.add(btn);
+    this.buttonArea.add(btn);
     btn = new Button(constants.SUBMIT());
     btn.addClickHandler(new ClickHandler(){
        @Override
@@ -258,9 +200,7 @@ public class MasterMindGraphic extends Composite implements View {
         }
        }
     });
-    dragController.makeDraggable(btn);
-    this.buttonArea2.add(btn);
-    this.buttonArea.add(this.buttonArea2);
+    this.buttonArea.add(btn);
     
   }
   
@@ -530,17 +470,15 @@ public class MasterMindGraphic extends Composite implements View {
   class DragButton extends Button {
     private final String text;
     
-    public DragButton(String optionF) {
+    public DragButton(final String optionF) {
       super(optionF);
       text = optionF;
-      final DragButton btn = this;
       this.addClickHandler(new ClickHandler(){
          @Override
           public void onClick(ClickEvent event) {
             if (enableClicks) {
-              toMove = btn;
-              //inputAppend(optionF);
-              //updateInputArea();
+              inputAppend(optionF);
+              updateInputArea();
               sound.play();
               dropLabel.setText(constants.SELECTFIRST() +text+
                   constants.SELETESECOND());
@@ -548,110 +486,11 @@ public class MasterMindGraphic extends Composite implements View {
             }
           }
       });
-//      btn.addDragStartHandler(new DragStartHandler() {
-//        @Override
-//        public void onDragStart(DragStartEvent event) {
-//            event.setData("text", text);
-//            dropLabel.setText("DIGIT "+text+
-//                " RECEIVED, DROP THE DIGIT TO DROP HERE BUTTON");
-//        }
-//      });
     }
     
     public DragButton cloneButton() {
       String text = this.text;
       return new DragButton(text);
-    }
-  }
-  
-  //DropButton
-  class DropButton extends Button {
-    public DropButton(String text) {
-      super(text);
-    }
-    
-    public void eatWidget(Button btn) {
-      btn.removeFromParent();
-      String data = btn.getText();
-      if (enableClicks) {
-        dropLabel.setText(constants.InputReceived());
-        inputAppend(data);
-        updateInputArea();
-        sound.play();
-      } else {
-        dropLabel.setText(constants.InputDisable());
-      }
-    }
-  }
-  //DropButton Controller
-  class ButtonDropController extends SimpleDropController {
-    private DropButton dropButton;
-
-    public ButtonDropController(DropButton dropButton) {
-      super(dropButton);
-      this.dropButton = dropButton;
-    }
-
-    @Override
-    public void onDrop(DragContext context) {
-      for (Widget widget : context.selectedWidgets) {
-        if (widget instanceof Button){
-          dropButton.eatWidget((Button)widget);
-        }
-      }
-      super.onDrop(context);
-    }
-
-    @Override
-    public void onEnter(DragContext context) {
-      dropLabel.setText(constants.DropToEnter());
-      super.onEnter(context);
-    }
-
-    @Override
-    public void onLeave(DragContext context) {
-      super.onLeave(context);
-    }
-
-    @Override
-    public void onPreviewDrop(DragContext context) throws VetoDragException {
-      super.onPreviewDrop(context);
-    }
-  }
-  
-//DropButton Controller
-  class AreaDropController extends SimpleDropController {
-    private AbsolutePanel panel;
-
-    public AreaDropController(AbsolutePanel panel) {
-      super(panel);
-      this.panel = panel;
-    }
-
-    @Override
-    public void onDrop(DragContext context) {
-      for (Widget widget : context.selectedWidgets) {
-        widget.removeFromParent();
-      }
-      dropLabel.setText("");
-      super.onDrop(context);
-    }
-
-    @Override
-    public void onEnter(DragContext context) {
-      Widget w= context.draggable;
-      dropLabel.setText(constants.SELECTFIRST()+((Button)w).getText()+constants.SELETESECOND());
-      super.onEnter(context);
-    }
-
-    @Override
-    public void onLeave(DragContext context) {
-      super.onLeave(context);
-    }
-
-    @Override
-    public void onPreviewDrop(DragContext context) throws VetoDragException {
-      super.onPreviewDrop(context);
     }
   }
 }

@@ -35,7 +35,7 @@ public class MasterMindPresenter {
   private final int MT = 10;
   private final String MAXDIGIT= "MaxDigit";
   private final int MD = 9;
-  private final int aiLevel = 3;
+  private final int aiLevel = 5;
   private MasterMindAI ai = new MasterMindAI(aiLevel);
   
   public interface View {
