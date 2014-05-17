@@ -265,7 +265,6 @@ public class MasterMindPresenter {
           }
         }
       } else if (FEEDBACK == state.get(CURRENTMOVE)){
-        //TODO calculate feedback Directly
         currentMove = FEEDBACK;
         view.setCoderStateFeedback(state);
         if (isMyTurn()){

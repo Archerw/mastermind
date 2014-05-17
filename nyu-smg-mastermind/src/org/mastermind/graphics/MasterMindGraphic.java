@@ -174,25 +174,25 @@ public class MasterMindGraphic extends Composite implements View {
          if (enableClicks) {
           if (currentState == FEEDBACK) {
             if (checkValidFeedbackInput(input)) {
+              enableClicks = false;
               updateMessageArea(constants.FeedbackSend());
               presenter.sendFeedbackMove(getFormatFeedback(input));
-              enableClicks = false;
             } else {
               updateMessageArea(constants.IllegalFeedback());
             }
           } else if (currentState == CODE) {
             if (checkValidCodeInput(input)) {
+              enableClicks = false;
               updateMessageArea(constants.CodeSend());
               presenter.sendCodeMove(input);
-              enableClicks = false;
             } else {
               updateMessageArea(constants.IllegalCode());
             }
           } else {
             if (checkValidCodeInput(input)) {
+              enableClicks = false;
               updateMessageArea(constants.GuessSend());
               presenter.sendGuessMove(input);
-              enableClicks = false;
             } else {
               updateMessageArea(constants.IllegalGuess());
             }

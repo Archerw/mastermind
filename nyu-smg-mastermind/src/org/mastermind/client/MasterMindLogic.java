@@ -14,7 +14,6 @@ import org.game_api.GameApi.SetTurn;
 import org.game_api.GameApi.SetVisibility;
 import org.game_api.GameApi.VerifyMove;
 import org.game_api.GameApi.VerifyMoveDone;
-import org.mastermind.client.Color;
 import org.mastermind.client.CodeFeedback;
 
 import com.google.common.collect.ImmutableList;
